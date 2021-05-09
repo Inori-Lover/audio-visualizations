@@ -1,0 +1,25 @@
+{
+  "name": "audio-visualizations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "umi dev",
+    "u": "ncu",
+    "postinstall": "umi generate tmp"
+  },
+  "keywords": [
+    "visualizations",
+    "react",
+    "audio"
+  ],
+  "author": "Inori",
+  "license": "GPLv3",
+  "devDependencies": {
+    "npm-check-updates": "^11.5.10",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.4",
+    "umi": "^3.4.15"
+  }
+}
