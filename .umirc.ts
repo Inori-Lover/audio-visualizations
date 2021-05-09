@@ -14,4 +14,12 @@ export default defineConfig({
     ios: false,
     ie: false,
   },
+
+  chainWebpack(memo, { env, webpack, createCSSRule }) {
+    memo.module
+      .rule('audio-with-file')
+      .test(/\.m4a$/)
+      .use('audio-with-file-loader')
+      .loader('file-loader');
+  },
 });
