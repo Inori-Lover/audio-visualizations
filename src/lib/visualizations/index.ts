@@ -21,7 +21,7 @@ const render = (
   const { width, height } = canvasEle;
 
   ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = '#fff';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
   let space = canvasEle.width / freqData.length;
   freqData.forEach((val, idx) => {
     ctx.beginPath();
