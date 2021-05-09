@@ -9,6 +9,8 @@ const syncFullPageCanvas = (canvasEle: HTMLCanvasElement) => {
   canvasEle.height = window.innerHeight;
 };
 
+const MAX_FREQ_SIZE = 2 ** 8 - 1;
+
 const render = (
   freqData: Uint8Array,
   canvasEle: HTMLCanvasElement,
@@ -16,12 +18,16 @@ const render = (
 ) => {
   syncFullPageCanvas(canvasEle);
 
-  ctx.clearRect(0, 0, canvasEle.width, canvasEle.height);
+  const { width, height } = canvasEle;
+
+  ctx.clearRect(0, 0, width, height);
   let space = canvasEle.width / freqData.length;
-  freqData.forEach((value, i) => {
+  freqData.forEach((val, idx) => {
     ctx.beginPath();
-    ctx.moveTo(space * i, canvasEle.height); //x,y
-    ctx.lineTo(space * i, canvasEle.height - value); //x,y
+    // 左上坐标系
+    ctx.moveTo(space * idx, height);
+    // 最大0.8画布高
+    ctx.lineTo(space * idx, height * (1 - (val / MAX_FREQ_SIZE) * 0.8));
     ctx.stroke();
   });
 };
