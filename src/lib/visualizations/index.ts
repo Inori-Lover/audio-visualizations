@@ -1,10 +1,29 @@
+import Stats from 'stats.js';
+
+const stats = new Stats();
+stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom);
+
 const syncFullPageCanvas = (canvasEle: HTMLCanvasElement) => {
   canvasEle.width = window.innerWidth;
   canvasEle.height = window.innerHeight;
 };
 
-const render = (freqData: Uint8Array) => {
-  console.log('freqData', freqData);
+const render = (
+  freqData: Uint8Array,
+  canvasEle: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+) => {
+  syncFullPageCanvas(canvasEle);
+
+  ctx.clearRect(0, 0, canvasEle.width, canvasEle.height);
+  let space = canvasEle.width / freqData.length;
+  freqData.forEach((value, i) => {
+    ctx.beginPath();
+    ctx.moveTo(space * i, canvasEle.height); //x,y
+    ctx.lineTo(space * i, canvasEle.height - value); //x,y
+    ctx.stroke();
+  });
 };
 
 export const visualizations = (
@@ -13,13 +32,18 @@ export const visualizations = (
 ) => {
   syncFullPageCanvas(canvasEle);
 
-  const ctx = new AudioContext();
-  const analyser = ctx.createAnalyser();
-  const audioSource = ctx.createMediaElementSource(audioEle);
+  const canvasCtx = canvasEle.getContext('2d');
+  if (!canvasCtx) {
+    return;
+  }
+
+  const audioCtx = new AudioContext();
+  const analyser = audioCtx.createAnalyser();
+  const audioSource = audioCtx.createMediaElementSource(audioEle);
   // pipe to analyser
   audioSource.connect(analyser);
   // pipe to destination（输出端）
-  analyser.connect(ctx.destination);
+  analyser.connect(audioCtx.destination);
 
   const freqData = new Uint8Array(analyser.frequencyBinCount);
 
@@ -29,18 +53,24 @@ export const visualizations = (
   const nextSmoothTask = { current: 0 };
 
   const renderer = () => {
+    stats.begin();
+
+    audioCtx.resume();
+
     // 将频率数据填入数组
     analyser.getByteFrequencyData(freqData);
 
-    render(freqData);
+    render(freqData, canvasEle, canvasCtx);
 
     if (audioEle.paused && !nextSmoothTask.current) {
       nextSmoothTask.current = (setTimeout(() => {
         cancelAnimationFrame(nextFrame.current);
         nextFrame.current = 0;
         nextSmoothTask.current = 0;
-      }, 600) as unknown) as number; // 600属于经验值，跟AnalyserNode.smoothingTimeConstant值相关
+      }, 1000) as unknown) as number; // 1000属于经验值，跟AnalyserNode.smoothingTimeConstant值相关
     }
+
+    stats.end();
 
     nextFrame.current = requestAnimationFrame(renderer);
   };
