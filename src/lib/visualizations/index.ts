@@ -1,8 +1,4 @@
-import Stats from 'stats.js';
-
-const stats = new Stats();
-stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+import { fps } from '@/utils/fps';
 
 const syncFullPageCanvas = (canvasEle: HTMLCanvasElement) => {
   canvasEle.width = window.innerWidth;
@@ -62,7 +58,7 @@ export const visualizations = (
   const nextSmoothTask = { current: 0 };
 
   const renderer = () => {
-    stats.begin();
+    fps.begin();
 
     audioCtx.resume();
 
@@ -79,7 +75,7 @@ export const visualizations = (
       }, 1000) as unknown) as number; // 1000属于经验值，跟AnalyserNode.smoothingTimeConstant值相关
     }
 
-    stats.end();
+    fps.end();
 
     nextFrame.current = requestAnimationFrame(renderer);
   };
