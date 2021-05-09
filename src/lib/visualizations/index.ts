@@ -3,6 +3,10 @@ const syncFullPageCanvas = (canvasEle: HTMLCanvasElement) => {
   canvasEle.height = window.innerHeight;
 };
 
+const render = (freqData: Uint8Array) => {
+  console.log('freqData', freqData);
+};
+
 export const visualizations = (
   canvasEle: HTMLCanvasElement,
   audioEle: HTMLAudioElement,
@@ -19,11 +23,27 @@ export const visualizations = (
 
   const freqData = new Uint8Array(analyser.frequencyBinCount);
 
-  const readFreqData = () => {
+  /** 下一帧 */
+  const nextFrame = { current: 0 };
+  /** 缓冲停止 */
+  const nextSmoothTask = { current: 0 };
+
+  const renderer = () => {
     // 将频率数据填入数组
     analyser.getByteFrequencyData(freqData);
-    requestAnimationFrame(readFreqData);
+
+    render(freqData);
+
+    if (audioEle.paused && !nextSmoothTask.current) {
+      nextSmoothTask.current = (setTimeout(() => {
+        cancelAnimationFrame(nextFrame.current);
+        nextFrame.current = 0;
+        nextSmoothTask.current = 0;
+      }, 600) as unknown) as number; // 600属于经验值，跟AnalyserNode.smoothingTimeConstant值相关
+    }
+
+    nextFrame.current = requestAnimationFrame(renderer);
   };
 
-  readFreqData();
+  audioEle.addEventListener('play', renderer);
 };
