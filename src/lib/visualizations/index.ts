@@ -21,6 +21,7 @@ const render = (
   const { width, height } = canvasEle;
 
   ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = '#fff';
   let space = canvasEle.width / freqData.length;
   freqData.forEach((val, idx) => {
     ctx.beginPath();
@@ -46,6 +47,8 @@ export const visualizations = (
   const audioCtx = new AudioContext();
   const analyser = audioCtx.createAnalyser();
   const audioSource = audioCtx.createMediaElementSource(audioEle);
+  // analyser.fftSize = 2 ** 10; // 影响频域级数，越大越接近时域曲线，涉及的频率也越多
+  // analyser.smoothingTimeConstant = 0.85; // 缓冲系数
   // pipe to analyser
   audioSource.connect(analyser);
   // pipe to destination（输出端）

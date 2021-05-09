@@ -2,6 +2,9 @@ import { FC, memo, useRef, useEffect, useCallback } from 'react';
 
 import { visualizations } from '@/lib/visualizations';
 import expAudioSrc from '@/assests/my_dearest.m4a';
+import bg from '@/assests/bg.jpg';
+
+import styles from './index.css';
 
 const main: FC = memo(function main() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -30,7 +33,7 @@ const main: FC = memo(function main() {
   }, []);
 
   return (
-    <>
+    <div className={styles.wrap} style={{ backgroundImage: `url("${bg}")` }}>
       <canvas ref={canvasRef} onClick={playHandle} />
       <audio
         style={{ display: 'none' }}
@@ -38,7 +41,7 @@ const main: FC = memo(function main() {
         loop
         ref={audioRef}
       />
-    </>
+    </div>
   );
 });
 
